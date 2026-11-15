@@ -1,5 +1,5 @@
-# Template Pages Project
+# Custom Cards Against Humanity
 
-[website](https://janniselef.github.io/pages-project-template) · [more information](https://github.com/JannisElef/pages-project-template)
+[website](https://janniselef.github.io/custom-cards-against-humanity/) · [more information](https://janniselef.github.io/projects/custom-cards-against-humanity/)
 
-This is a template for a project having an independent github-pages directory.
+Tool for generating custom CAH-style cards for printing.

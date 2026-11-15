@@ -1,0 +1,700 @@
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<style>
+    :root {
+        --bg: #fff;
+        --fg: #000;
+        --mut: #666;
+        --line: #000;
+        --pane: #f1f1f1;
+        --paper-bg: #cfcfcf;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        color-scheme: light
+    }
+
+    @media (prefers-color-scheme:dark) {
+        :root:not([data-theme="light"]) {
+            --bg: #000;
+            --fg: #fff;
+            --mut: #aaa;
+            --line: #fff;
+            --pane: #1a1a1a;
+            --paper-bg: #2a2a2a;
+            color-scheme: dark
+        }
+    }
+
+    :root[data-theme="dark"] {
+        --bg: #000;
+        --fg: #fff;
+        --mut: #aaa;
+        --line: #fff;
+        --pane: #1a1a1a;
+        --paper-bg: #2a2a2a;
+        color-scheme: dark
+    }
+
+    html {
+        scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    *,
+    *:before,
+    *:after {
+        box-sizing: border-box
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 700 16px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif
+    }
+
+    .ui {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 8px
+    }
+
+    h1 {
+        font-size: 28px;
+        line-height: 1;
+        letter-spacing: -.02em;
+        margin: 0 0 16px
+    }
+
+    .lead {
+        font-weight: 400;
+        color: var(--mut);
+        max-width: 42em;
+        margin: 0 0 24px
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+        gap: 20px
+    }
+
+    @media (max-width:800px) {
+        .grid {
+            grid-template-columns: 1fr
+        }
+    }
+
+    .box {
+        background: var(--pane);
+        padding: 16px;
+        border-radius: 0
+    }
+
+    .box h2 {
+        font-size: 18px;
+        margin: 0 0 10px
+    }
+
+    textarea {
+        width: 100%;
+        height: 300px;
+        font: 13px/1.45 ui-monospace, Menlo, Consolas, monospace;
+        background: var(--bg);
+        color: var(--fg);
+        border: 2px solid var(--line);
+        padding: 10px;
+        resize: vertical
+    }
+
+    label {
+        display: block;
+        font-size: 14px;
+        margin: 0 0 12px
+    }
+
+    label span {
+        display: block;
+        margin-bottom: 4px
+    }
+
+    input[type=text],
+    select {
+        width: 100%;
+        font: 700 15px inherit;
+        font-family: inherit;
+        padding: 8px;
+        background: var(--bg);
+        color: var(--fg);
+        border: 2px solid var(--line);
+        border-radius: 0
+    }
+
+    label.chk {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-weight: 400
+    }
+
+    button,
+    .btn {
+        font: 700 15px "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background: var(--fg);
+        color: var(--bg);
+        border: 2px solid var(--fg);
+        padding: 10px 16px;
+        cursor: pointer;
+        border-radius: 0;
+        display: inline-block
+    }
+
+    button.alt,
+    .btn.alt {
+        background: transparent;
+        color: var(--fg)
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    .btn:focus-within {
+        outline: 3px solid #f5c400;
+        outline-offset: 2px
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px
+    }
+
+    .hint {
+        font-weight: 400;
+        font-size: 13px;
+        color: var(--mut);
+        margin: 8px 0 0
+    }
+
+    .hint code {
+        background: var(--bg);
+        padding: 1px 4px
+    }
+
+    .bar {
+        max-width: 1100px;
+        margin: 16px auto 0;
+        padding: 0 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center
+    }
+
+    .bar .info {
+        font-weight: 400;
+        color: var(--mut)
+    }
+
+    .sheets {
+        background: var(--paper-bg);
+        margin-top: 16px;
+        padding: 16px;
+        overflow-x: auto
+    }
+
+    .page {
+        --pw: 210mm;
+        --ph: 297mm;
+        --edge: #000;
+        width: var(--pw);
+        height: calc(var(--ph) - .6mm);
+        margin: 0;
+        transform-origin: 0 0;
+        transform: scale(var(--s, 1));
+        background: #fff;
+        color: #000;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 6.45mm;
+        overflow: hidden;
+        flex: none
+    }
+
+    .page.bp {
+        --edge: #fff;
+        background: #231f20;
+        color: #fff
+    }
+
+    .wrap {
+        width: 201.92mm
+    }
+
+    .pgw {
+        margin: 0 auto 16px
+    }
+
+    @media (max-width:800px) {
+
+        input[type=text],
+        select,
+        textarea {
+            font-size: 16px
+        }
+
+        .sheets {
+            padding: 8px
+        }
+    }
+
+    .cards {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 50.48mm);
+        grid-template-rows: repeat(5, 50.48mm)
+    }
+
+    .card {
+        --cbg: #fff
+    }
+
+    .card.b {
+        --cbg: #231f20
+    }
+
+    .card {
+        width: 50.48mm;
+        height: 50.48mm;
+        position: relative;
+        background: #fff;
+        color: #000;
+        padding: 2.97mm 4mm 0 3.775mm;
+        overflow: hidden;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-weight: 700
+    }
+
+    .cut .card {
+        box-shadow: inset 0 0 0 .07mm var(--edge)
+    }
+
+    .card.b {
+        background: #231f20;
+        color: #fff
+    }
+
+    .card.empty {
+        background: transparent
+    }
+
+    .txt {
+        height: 38mm;
+        font-size: 4.5mm;
+        line-height: 5.29mm;
+        overflow: hidden;
+        hyphens: none;
+        overflow-wrap: break-word
+    }
+
+    .bw {
+        white-space: nowrap
+    }
+
+    .blank {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        vertical-align: -.13mm;
+        border-bottom: .265mm solid currentColor
+    }
+
+    .foot {
+        position: absolute;
+        left: 3.14mm;
+        right: 4.43mm;
+        bottom: 2.97mm;
+        height: 4.34mm;
+        display: flex;
+        align-items: center;
+        gap: 1.18mm;
+        font-size: 1.8mm;
+        line-height: 1
+    }
+
+    .foot .lg {
+        height: 4.34mm;
+        width: 4.48mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none
+    }
+
+    .foot .lg img,
+    .foot .lg svg {
+        max-height: 100%;
+        max-width: 100%;
+        display: block
+    }
+
+    .b .lg img.inv {
+        filter: invert(1)
+    }
+
+    .pick {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: .55mm;
+        font-size: 2.1mm
+    }
+
+    .pick svg {
+        width: 3.09mm;
+        height: 3.09mm;
+        display: block;
+        overflow: visible
+    }
+
+    .pick circle {
+        fill: currentColor
+    }
+
+    .pick text {
+        fill: var(--cbg);
+        font-family: inherit
+    }
+
+    .bsv {
+        display: block
+    }
+
+    .bsv rect {
+        fill: #000
+    }
+
+    .bsv text {
+        fill: #fff;
+        font-family: inherit
+    }
+
+    .bp .bsv rect {
+        fill: #fff
+    }
+
+    .bp .bsv text {
+        fill: #231f20
+    }
+
+    .pick i {
+        font-style: normal;
+        width: 3.05mm;
+        height: 3.05mm;
+        border-radius: 50%;
+        background: #000;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.1mm
+    }
+
+    .b .pick i {
+        background: #fff;
+        color: #000
+    }
+
+    .badge {
+        margin: 7.02mm 3.18mm 0 auto;
+        width: max-content
+    }
+
+    @media print {
+        :root {
+            --paper-bg: #fff
+        }
+
+        html,
+        body {
+            background: #fff
+        }
+
+        .ui,
+        .bar {
+            display: none !important
+        }
+
+        .sheets {
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            overflow: visible
+        }
+
+        .page {
+            margin: 0;
+            transform: none;
+            break-after: page;
+            page-break-after: always
+        }
+
+        .pgw {
+            width: auto !important;
+            height: auto !important;
+            margin: 0
+        }
+
+        .page:last-child {
+            break-after: auto;
+            page-break-after: auto
+        }
+
+        .page,
+        .card,
+        .card.b,
+        .badge,
+        .pick i {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact
+        }
+    }
+
+    .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 8px
+    }
+
+    .top h1 {
+        margin: 0
+    }
+
+    .lang {
+        display: flex;
+        gap: 4px
+    }
+
+    .lang button {
+        padding: 4px 9px;
+        font-size: 13px
+    }
+
+    .lang button[aria-pressed=true] {
+        background: var(--fg);
+        color: var(--bg)
+    }
+
+    .desc {
+        font-weight: 400;
+        color: var(--mut);
+        max-width: 44em;
+        margin: 0 0 20px
+    }
+</style>
+<style id="pg">
+    @page {
+        size: A4;
+        margin: 0
+    }
+</style>
+</head>
+
+<body>
+    <div class="ui">
+        <div class="top">
+            <h1 data-i="h1"></h1>
+            <div class="lang"><button class="alt" id="lde" type="button">DE</button><button class="alt" id="len"
+                    type="button">EN</button></div>
+        </div>
+        <p class="desc" data-i="desc"></p>
+        <div class="grid">
+            <div class="box">
+                <h2 data-i="cards"></h2>
+                <textarea id="csv" spellcheck="false"></textarea>
+                <p class="hint" data-h="hint"></p>
+                <div class="row">
+                    <label class="btn alt" style="margin:0"><span data-i="load"></span><input id="csvfile" type="file"
+                            accept=".csv,.txt,text/csv" hidden></label>
+                    <button class="alt" id="ex" type="button" data-i="ex"></button>
+                </div>
+            </div>
+            <div class="box">
+                <h2 data-i="look"></h2>
+                <label><span data-i="set"></span><input type="text" id="set" value="Set 1"></label>
+                <label><span data-i="lname"></span><input type="text" id="lname" value="Cards Against Humanity"></label>
+                <label><span data-i="logo"></span>
+                    <input type="file" id="logo" accept="image/*">
+                </label>
+                <label class="chk"><input type="checkbox" id="inv" checked> <span data-i="inv"></span></label>
+                <label class="chk"><input type="checkbox" id="cut" checked> <span data-i="cut"></span></label>
+                <label class="chk"><input type="checkbox" id="fill" checked> <span data-i="fill"></span></label>
+                <label><span data-i="paper"></span><select id="paper">
+                        <option value="A4">A4</option>
+                        <option value="Letter">US Letter</option>
+                    </select></label>
+                <div class="row"><button class="alt" id="rlogo" type="button" data-i="rlogo"></button></div>
+            </div>
+        </div>
+    </div>
+    <div class="bar">
+        <button id="print" type="button" data-i="print"></button>
+        <span class="info" id="info"></span>
+    </div>
+    <div class="bar"><span class="info" data-i="tip"></span></div>
+    <div class="sheets cut" id="sheets"></div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        const EXDE = 'typ,text\nb,"Alles ist besser mit ___."\nb,"Warum tut mir alles weh?"\nb,"Schritt 1: ___.\\nSchritt 2: ___.\\nSchritt 3: Profit."\nb,"Wenn ich du wäre, dann wäre ich ___."\nb,"___ +\\n___\\n= ___."\nb,"Und der Oscar für\\n___\\ngeht an\\n___."\nw,"Ein überraschend kleiner Pinguin."\nw,"Die Rückseite des Mondes."\nw,"Mein Chef beim Karaoke."\nw,"Kaltes Nudelwasser."\nw,"Eine Steuererklärung."\nw,"Ein Wanderschuh voller Pudding."\nw,"Oma im Fitnessstudio."\nw,"Der letzte Zug nach Hause."\nw,"Unnötig viele Treppen."';
+        let L = ''; try { L = localStorage.getItem('cahlang') || '' } catch (e) { }
+        if (L !== 'de' && L !== 'en') L = /^de/i.test((navigator.languages && navigator.languages[0]) || navigator.language || '') ? 'de' : 'en';
+        const EXEN = 'type,text\nb,"Everything is better with ___."\nb,"Why does everything hurt?"\nb,"Step 1: ___.\\nStep 2: ___.\\nStep 3: Profit."\nb,"If I were you, I would be ___."\nb,"___ +\\n___\\n= ___."\nb,"And the Oscar for\\n___\\ngoes to\\n___."\nw,"A surprisingly small penguin."\nw,"The far side of the moon."\nw,"My boss at karaoke."\nw,"Cold pasta water."\nw,"A tax return."\nw,"A hiking boot full of pudding."\nw,"Grandma at the gym."\nw,"The last train home."\nw,"Way too many stairs."';
+        const EXS = { de: EXDE, en: EXEN };
+        const T = {
+            de: { h1: 'Kartengenerator', title: 'Kartengenerator – Print & Play', desc: 'Aus einer einfachen CSV werden druckfertige Kartenseiten im Cards-Against-Humanity-Stil: 4 × 5 Karten pro Seite, Setname und Logo frei wählbar, drucken oder als PDF speichern.', cards: 'Karten (CSV)', ariaCsv: 'Karten als CSV', hint: '<code>b</code> = schwarz, <code>w</code> = weiß · <code>___</code> = Lücke · <code>\\n</code> = Zeilenumbruch · Pick wird aus der Lückenzahl erkannt', load: 'CSV-Datei laden', ex: 'Beispiel laden', look: 'Aussehen', set: 'Setname (Seitenmarke)', lname: 'Logo-Text auf der Karte', logo: 'Eigenes Logo (PNG/SVG, am besten schwarz auf transparent)', inv: 'Eigenes Logo auf schwarzen Karten invertieren', cut: 'Schnittlinien zeichnen', fill: 'Leere Felder am Seitenende mit Rahmen füllen', paper: 'Papierformat', rlogo: 'Standardlogo', print: 'Drucken / als PDF speichern', tip: 'Im Druckdialog: Ränder „Keine“, Skalierung 100 % (nicht „Anpassen“), Hintergrundgrafiken an.', info: (w, b, p) => w + ' weiße, ' + b + ' schwarze Karten · ' + p + ' Seite' + (p === 1 ? '' : 'n') },
+            en: { h1: 'Card Generator', title: 'Card Generator – Print & Play', desc: 'Turn a simple CSV into print-ready card sheets in the Cards Against Humanity style: 4 × 5 cards per page, custom set name and logo, then print or save as PDF.', cards: 'Cards (CSV)', ariaCsv: 'Cards as CSV', hint: '<code>b</code> = black, <code>w</code> = white · <code>___</code> = blank · <code>\\n</code> = line break · Pick is detected from the number of blanks', load: 'Load CSV file', ex: 'Load example', look: 'Appearance', set: 'Set name (page badge)', lname: 'Logo text on the card', logo: 'Custom logo (PNG/SVG, ideally black on transparent)', inv: 'Invert custom logo on black cards', cut: 'Draw cut lines', fill: 'Fill empty slots at the end of a page with outlines', paper: 'Paper size', rlogo: 'Default logo', print: 'Print / save as PDF', tip: 'In the print dialog: margins “None”, scale 100% (not “Fit to page”), background graphics on.', info: (w, b, p) => w + ' white, ' + b + ' black cards · ' + p + ' page' + (p === 1 ? '' : 's') }
+        };
+        function applyLang(swap) {
+            document.documentElement.lang = L; document.title = T[L].title;
+            document.querySelectorAll('[data-i]').forEach(e => { e.textContent = T[L][e.dataset.i]; });
+            document.querySelectorAll('[data-h]').forEach(e => { e.innerHTML = T[L][e.dataset.h]; });
+            $('csv').setAttribute('aria-label', T[L].ariaCsv);
+            $('lde').setAttribute('aria-pressed', L === 'de'); $('len').setAttribute('aria-pressed', L === 'en');
+            if (swap) { const o = L === 'de' ? 'en' : 'de'; if ($('csv').value === EXS[o]) $('csv').value = EXS[L]; }
+        }
+        function setLang(l) { L = l; try { localStorage.setItem('cahlang', l); } catch (e) { } applyLang(true); render(); }
+        const LOGO = '<svg viewBox="0 0 12.7 12.3"><path fill="currentColor" stroke="currentColor" stroke-width=".12" d="M0.65 2.87C0.65 2.87 0.12 3.06 0.31 3.59L3.27 11.71C3.27 11.71 3.46 12.24 3.99 12.04L9.45 10.06C9.45 10.06 9.98 9.86 9.79 9.33L6.84 1.21C6.84 1.21 6.64 0.68 6.11 0.88L0.65 2.87Z"/><path style="fill:var(--cbg)" stroke="currentColor" stroke-width=".3" d="M6.22 0.29C6.22 0.29 5.66 0.22 5.59 0.78L4.54 9.35C4.54 9.35 4.47 9.91 5.03 9.98L10.8 10.69C10.8 10.69 11.37 10.76 11.43 10.2L12.49 1.62C12.49 1.62 12.56 1.06 11.99 0.99L6.22 0.29Z"/></svg>';
+        function badge(t) { const W = Math.max(11.6, t.length * 3.3 + 5.2); return '<svg class="bsv" viewBox="0 0 ' + W + ' 11.6" style="height:4.1mm;width:' + (W / 11.6 * 4.1) + 'mm"><rect width="' + W + '" height="11.6" rx="5.8"/><text x="' + W / 2 + '" y="7.77" text-anchor="middle" font-size="5.5" font-weight="700">' + esc(t) + '</text></svg>'; }
+        let logoURL = null;
+        const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+        function parseCSV(t) {
+            t = t.replace(/^\uFEFF/, '');
+            const first = t.split('\n')[0] || '';
+            const d = first.split(';').length > first.split(',').length ? ';' : ',';
+            const rows = []; let row = [], f = '', q = false;
+            for (let i = 0; i < t.length; i++) {
+                const c = t[i];
+                if (q) { if (c === '"') { if (t[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+                else if (c === '"') q = true;
+                else if (c === d) { row.push(f); f = ''; }
+                else if (c === '\n' || c === '\r') { if (c === '\r' && t[i + 1] === '\n') i++; row.push(f); f = ''; if (row.some(x => x.trim())) rows.push(row); row = []; }
+                else f += c;
+            }
+            row.push(f); if (row.some(x => x.trim())) rows.push(row);
+            if (rows.length && /^(typ|type)$/i.test(rows[0][0].trim())) rows.shift();
+            return rows.map(r => {
+                const ty = (r[0] || '').trim().toLowerCase();
+                return { b: /^(b|s|black|schwarz)/.test(ty), text: (r.slice(1).join(d)).trim() };
+            }).filter(c => c.text);
+        }
+
+        function textHTML(text) {
+            text = text.replace(/\\n/g, '\n');
+            const nl = s => esc(s).replace(/\n/g, '<br>');
+            const segs = text.split(/_{3,}/);
+            let h = nl(segs[0]);
+            for (let i = 1; i < segs.length; i++) {
+                const s = segs[i], p = s.match(/^[.,!?:;…“”„"')\]]*/)[0]; let rest = s.slice(p.length), tail = '';
+                const m = rest.match(/^[ \t]*(\S{1,4})[ \t]*(?=\n|$)/);
+                if (m) { tail = m[1]; rest = rest.slice(m[0].length); }
+                h += '<span class="bw"><span class="blank"></span><span class="pu">' + esc(p) + '</span>' + (tail ? '<span class="tl"> ' + esc(tail) + '</span>' : '') + '</span>';
+                if (rest.trim()) h += (/^\s*\n/.test(rest) ? '' : '<br>') + nl(rest.replace(/^[ \t]+/, ''));
+                else if (/^\s*\n/.test(rest)) h += '<br>';
+            }
+            return h;
+        }
+
+        function cardHTML(c, i) {
+            const n = (c.text.match(/_{3,}/g) || []).length;
+            const logo = logoURL ? '<img class="' + ($('inv').checked ? 'inv' : '') + '" src="' + logoURL + '" alt="">' : LOGO;
+            const pick = (c.b && n >= 2) ? '<div class="pick">PICK <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/><text x="5" y="8" text-anchor="middle" font-size="8.4" font-weight="700">' + n + '</text></svg></div>' : '';
+            return '<div class="card ' + (c.b ? 'b' : 'w') + '"><div class="txt">' + textHTML(c.text) + '</div><div class="foot"><span class="lg">' + logo + '</span><span>' + esc($('lname').value) + '</span>' + pick + '</div></div>';
+        }
+
+        function fit(card) {
+            const t = card.querySelector('.txt');
+            let fs = 4.5;
+            const place = () => {
+                t.style.fontSize = fs + 'mm';
+                t.querySelectorAll('br.ab').forEach(b => b.remove());
+                t.querySelectorAll('.bw').forEach(bw => {
+                    const bl = bw.querySelector('.blank'), pu = bw.querySelector('.pu');
+                    bl.style.width = '0';
+                    const tr = t.getBoundingClientRect();
+                    const em = parseFloat(getComputedStyle(t).fontSize);
+                    const tl = bw.querySelector('.tl'), ex = () => pu.getBoundingClientRect().width + (tl ? tl.getBoundingClientRect().width : 0);
+                    const k = tr.width / t.offsetWidth || 1;
+                    let w = (tr.right - bl.getBoundingClientRect().left - ex()) / k - 1;
+                    if (w < 18 / fs * em) {
+                        const br = document.createElement('br'); br.className = 'ab'; bw.before(br);
+                        w = (tr.right - bl.getBoundingClientRect().left - ex()) / k - 1;
+                    }
+                    bl.style.width = Math.max(w, em * 2) + 'px';
+                });
+            };
+            place();
+            while (t.scrollHeight > t.clientHeight + 1 && fs > 3) { fs -= .1; place(); }
+        }
+
+        function render() {
+            const cards = parseCSV($('csv').value);
+            const W = cards.filter(c => !c.b), B = cards.filter(c => c.b);
+            const pages = [];
+            for (const list of [W, B]) for (let i = 0; i < list.length; i += 20) pages.push(list.slice(i, i + 20));
+            const fill = $('fill').checked, set = $('set').value;
+            $('sheets').className = 'sheets' + ($('cut').checked ? ' cut' : '');
+            $('sheets').innerHTML = pages.map((p, pi) => {
+                let h = p.map(cardHTML).join('');
+                if (fill) for (let k = p.length; k < 20; k++) h += '<div class="card empty"></div>';
+                return '<div class="pgw"><section class="page' + (p[0] && p[0].b ? ' bp' : '') + '"><div class="wrap"><div class="cards">' + h + '</div><div class="badge">' + badge(set) + '</div></div></section></div>';
+            }).join('');
+            const paper = $('paper').value;
+            document.querySelectorAll('.page').forEach(p => { p.style.setProperty('--pw', paper === 'A4' ? '210mm' : '215.9mm'); p.style.setProperty('--ph', paper === 'A4' ? '297mm' : '279.4mm'); });
+            $('pg').textContent = '@page{size:' + (paper === 'A4' ? 'A4' : 'letter') + ';margin:0}';
+            $('info').textContent = T[L].info(W.length, B.length, pages.length);
+            rescale();
+            const go = () => document.querySelectorAll('.card:not(.empty)').forEach(fit);
+            go();
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+            save();
+        }
+
+        function save() {
+            try { localStorage.setItem('cahgen', JSON.stringify({ csv: $('csv').value, set: $('set').value, lname: $('lname').value, inv: $('inv').checked, cut: $('cut').checked, fill: $('fill').checked, paper: $('paper').value, logo: logoURL })); } catch (e) { }
+        }
+        function load() {
+            let s = null; try { s = JSON.parse(localStorage.getItem('cahgen') || 'null'); } catch (e) { }
+            $('csv').value = (s && s.csv) || EXS[L];
+            if (s) { $('set').value = s.set || 'Set 1'; $('lname').value = s.lname || ''; $('inv').checked = s.inv !== false; $('cut').checked = s.cut !== false; $('fill').checked = s.fill !== false; $('paper').value = s.paper || 'A4'; logoURL = s.logo || null; }
+        }
+
+        let tm; const later = () => { clearTimeout(tm); tm = setTimeout(render, 200); };
+        ['csv', 'set', 'lname'].forEach(i => $(i).addEventListener('input', later));
+        ['inv', 'cut', 'fill', 'paper'].forEach(i => $(i).addEventListener('change', render));
+        $('csvfile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { $('csv').value = t; render(); }); });
+        $('logo').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { logoURL = r.result; render(); }; r.readAsDataURL(f); });
+        $('rlogo').addEventListener('click', () => { logoURL = null; $('logo').value = ''; render(); });
+        $('ex').addEventListener('click', () => { $('csv').value = EXS[L]; render(); });
+        $('print').addEventListener('click', () => window.print());
+        function rescale() {
+            const sh = $('sheets'), pg = sh.querySelectorAll('.page'); if (!pg.length) return;
+            const cs = getComputedStyle(sh), s = Math.min(1, (sh.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) / pg[0].offsetWidth);
+            sh.querySelectorAll('.pgw').forEach(w => { const p = w.firstChild; w.style.width = p.offsetWidth * s + 'px'; w.style.height = p.offsetHeight * s + 'px'; p.style.setProperty('--s', s); });
+        }
+        addEventListener('resize', rescale);
+        $('lde').addEventListener('click', () => setLang('de')); $('len').addEventListener('click', () => setLang('en'));
+        load(); applyLang(false); render();
+    </script>
+</body>
+
+</html>
