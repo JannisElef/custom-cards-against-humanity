@@ -505,6 +505,16 @@
         max-width: 44em;
         margin: 0 0 20px
     }
+.card{--lbf:#000;--lbr:#000;--lff:#fff;--lfr:#000}
+.card.b{--lbf:#231f20;--lbr:#fff;--lff:#fff;--lfr:#231f20}
+.card.b.invl{--lbf:#fff;--lbr:#fff;--lff:#231f20;--lfr:#fff}
+.foot .lg svg{overflow:visible}
+.row .btn{display:inline-flex;align-items:center}
+.btn span{margin:0}
+dialog{width:min(92vw,520px);max-height:92vh;overflow-y:auto;border:2px solid var(--line);background:var(--bg);color:var(--fg);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+dialog h2{margin:0 0 12px;font-size:18px}
+#edc{display:block;width:100%;max-width:360px;aspect-ratio:480/465;margin:12px auto;border:2px solid var(--line);background:repeating-conic-gradient(#ccc 0 25%,#eee 0 50%) 0 0/16px 16px;touch-action:none;cursor:grab}
 </style>
 <style id="pg">
     @page {
@@ -530,6 +540,7 @@
                 <div class="row">
                     <label class="btn alt" style="margin:0"><span data-i="load"></span><input id="csvfile" type="file"
                             accept=".csv,.txt,text/csv" hidden></label>
+                    <button class="alt" id="exp" type="button" data-i="exp"></button>
                     <button class="alt" id="ex" type="button" data-i="ex"></button>
                 </div>
             </div>
@@ -540,17 +551,30 @@
                 <label><span data-i="logo"></span>
                     <input type="file" id="logo" accept="image/*">
                 </label>
-                <label class="chk"><input type="checkbox" id="inv" checked> <span data-i="inv"></span></label>
+                <label class="chk"><input type="checkbox" id="inv"> <span data-i="inv"></span></label>
                 <label class="chk"><input type="checkbox" id="cut" checked> <span data-i="cut"></span></label>
                 <label class="chk"><input type="checkbox" id="fill" checked> <span data-i="fill"></span></label>
                 <label><span data-i="paper"></span><select id="paper">
                         <option value="A4">A4</option>
                         <option value="Letter">US Letter</option>
                     </select></label>
-                <div class="row"><button class="alt" id="rlogo" type="button" data-i="rlogo"></button></div>
+                <div class="row"><button class="alt" id="edopen" type="button" data-i="edBtn"></button><button class="alt" id="rlogo" type="button" data-i="rlogo"></button></div>
             </div>
         </div>
     </div>
+    <dialog id="ed">
+        <h2 data-i="edTitle"></h2>
+        <label class="chk"><input type="radio" name="edm" value="front" checked> <span data-i="edM2"></span></label>
+        <label class="chk"><input type="radio" name="edm" value="img"> <span data-i="edM1"></span></label>
+        <label class="btn alt" style="margin:0"><span data-i="edFile"></span><input id="edfile" type="file" accept="image/*" hidden></label>
+        <canvas id="edc" width="480" height="465"></canvas>
+        <label><span data-i="edZoom"></span><input id="edz" type="range" min=".1" max="4" step=".01" value="1" style="width:100%"></label>
+        <label><span data-i="edRot"></span><input id="edr" type="range" min="-180" max="180" step="1" value="0" style="width:100%"></label>
+        <label class="chk"><input type="checkbox" id="edbw"> <span data-i="edBW"></span></label>
+        <label><span data-i="edTh"></span><input id="edt" type="range" min="20" max="235" step="1" value="128" style="width:100%"></label>
+        <p class="hint" data-i="edHint"></p>
+        <div class="row"><button id="edok" type="button" data-i="edOk"></button><button class="alt" id="edreset" type="button" data-i="edReset"></button><button class="alt" id="edcancel" type="button" data-i="edCancel"></button></div>
+    </dialog>
     <div class="bar">
         <button id="print" type="button" data-i="print"></button>
         <span class="info" id="info"></span>
@@ -566,8 +590,8 @@
         const EXEN = 'type,text\nb,"Everything is better with ___."\nb,"Why does everything hurt?"\nb,"Step 1: ___.\\nStep 2: ___.\\nStep 3: Profit."\nb,"If I were you, I would be ___."\nb,"___ +\\n___\\n= ___."\nb,"And the Oscar for\\n___\\ngoes to\\n___."\nw,"A surprisingly small penguin."\nw,"The far side of the moon."\nw,"My boss at karaoke."\nw,"Cold pasta water."\nw,"A tax return."\nw,"A hiking boot full of pudding."\nw,"Grandma at the gym."\nw,"The last train home."\nw,"Way too many stairs."';
         const EXS = { de: EXDE, en: EXEN };
         const T = {
-            de: { h1: 'Kartengenerator', desc: 'Druckfertige Kartenseiten im Cards-Against-Humanity-Stil erstellen: Setname und Logo frei wählbar, direkt drucken oder als PDF speichern.', cards: 'Karten (CSV)', ariaCsv: 'Karten als CSV', hint: '<code>b</code> = schwarz, <code>w</code> = weiß · <code>___</code> = Lücke · <code>\\n</code> = Zeilenumbruch · Pick wird aus der Lückenzahl erkannt', load: 'CSV-Datei laden', ex: 'Beispiel laden', look: 'Aussehen', set: 'Setname (Seitenmarke)', lname: 'Logo-Text auf der Karte', logo: 'Eigenes Logo (PNG/SVG, am besten schwarz auf transparent)', inv: 'Eigenes Logo auf schwarzen Karten invertieren', cut: 'Schnittlinien zeichnen', fill: 'Leere Felder am Seitenende mit Rahmen füllen', paper: 'Papierformat', rlogo: 'Standardlogo', print: 'Drucken / als PDF speichern', tip: 'Im Druckdialog: Ränder „Keine“, Skalierung 100 % (nicht „Anpassen“), Hintergrundgrafiken an.', info: (w, b, p) => w + ' weiße, ' + b + ' schwarze Karten · ' + p + ' Seite' + (p === 1 ? '' : 'n') },
-            en: { h1: 'Card Generator', desc: 'Create print-ready card sheets in the Cards Against Humanity style: Custom set name and logo, print directly or save as PDF.', cards: 'Cards (CSV)', ariaCsv: 'Cards as CSV', hint: '<code>b</code> = black, <code>w</code> = white · <code>___</code> = blank · <code>\\n</code> = line break · Pick is detected from the number of blanks', load: 'Load CSV file', ex: 'Load example', look: 'Appearance', set: 'Set name (page badge)', lname: 'Logo text on the card', logo: 'Custom logo (PNG/SVG, ideally black on transparent)', inv: 'Invert custom logo on black cards', cut: 'Draw cut lines', fill: 'Fill empty slots at the end of a page with outlines', paper: 'Paper size', rlogo: 'Default logo', print: 'Print / save as PDF', tip: 'In the print dialog: margins “None”, scale 100% (not “Fit to page”), background graphics on.', info: (w, b, p) => w + ' white, ' + b + ' black cards · ' + p + ' page' + (p === 1 ? '' : 's') }
+            de: { h1: 'Kartengenerator', desc: 'Druckfertige Kartenseiten im Cards-Against-Humanity-Stil erstellen: Setname und Logo frei wählbar, direkt drucken oder als PDF speichern.', cards: 'Karten (CSV)', ariaCsv: 'Karten als CSV', hint: '<code>b</code> = schwarz, <code>w</code> = weiß · <code>___</code> = Lücke · <code>\\n</code> = Zeilenumbruch · Pick wird aus der Lückenzahl erkannt', load: 'CSV-Datei laden', exp: 'CSV exportieren', edBtn: 'Logo-Editor', edTitle: 'Logo-Editor', edM2: 'Bild auf das Standardlogo (vordere Karte)', edM1: 'Bild als Logo (ersetzt das Standardlogo)', edFile: 'Bild wählen', edZoom: 'Größe', edRot: 'Drehung', edBW: 'Schwarz-Weiß (für den Druck)', edTh: 'Schwellwert', edHint: 'Ziehen = verschieben, Mausrad oder Regler = skalieren. Was im Rahmen sichtbar ist, wird zugeschnitten übernommen.', edOk: 'Übernehmen', edCancel: 'Abbrechen', edReset: 'Zurücksetzen', ex: 'Beispiel laden', look: 'Aussehen', set: 'Setname (Seitenmarke)', lname: 'Logo-Text auf der Karte', logo: 'Eigenes Logo (PNG/SVG, am besten schwarz auf transparent)', inv: 'Logo auf schwarzen Karten invertieren', cut: 'Schnittlinien zeichnen', fill: 'Leere Felder am Seitenende mit Rahmen füllen', paper: 'Papierformat', rlogo: 'Standardlogo', print: 'Drucken / als PDF speichern', tip: 'Im Druckdialog: Ränder „Keine“, Skalierung 100 % (nicht „Anpassen“), Hintergrundgrafiken an.', info: (w, b, p) => w + ' weiße, ' + b + ' schwarze Karten · ' + p + ' Seite' + (p === 1 ? '' : 'n') },
+            en: { h1: 'Card Generator', desc: 'Create print-ready card sheets in the Cards Against Humanity style: Custom set name and logo, print directly or save as PDF.', cards: 'Cards (CSV)', ariaCsv: 'Cards as CSV', hint: '<code>b</code> = black, <code>w</code> = white · <code>___</code> = blank · <code>\\n</code> = line break · Pick is detected from the number of blanks', load: 'Load CSV file', exp: 'Export CSV', edBtn: 'Logo editor', edTitle: 'Logo editor', edM2: 'Image on the default logo (front card)', edM1: 'Image as logo (replaces default logo)', edFile: 'Choose image', edZoom: 'Size', edRot: 'Rotation', edBW: 'Black & white (for printing)', edTh: 'Threshold', edHint: 'Drag = move, mouse wheel or slider = scale. What is visible inside the frame is kept (cropped).', edOk: 'Apply', edCancel: 'Cancel', edReset: 'Reset', ex: 'Load example', look: 'Appearance', set: 'Set name (page badge)', lname: 'Logo text on the card', logo: 'Custom logo (PNG/SVG, ideally black on transparent)', inv: 'Invert logo on black cards', cut: 'Draw cut lines', fill: 'Fill empty slots at the end of a page with outlines', paper: 'Paper size', rlogo: 'Default logo', print: 'Print / save as PDF', tip: 'In the print dialog: margins “None”, scale 100% (not “Fit to page”), background graphics on.', info: (w, b, p) => w + ' white, ' + b + ' black cards · ' + p + ' page' + (p === 1 ? '' : 's') }
         };
         function applyLang(swap) {
             document.documentElement.lang = L;
@@ -578,9 +602,9 @@
             if (swap) { const o = L === 'de' ? 'en' : 'de'; if ($('csv').value === EXS[o]) $('csv').value = EXS[L]; }
         }
         function setLang(l) { L = l; try { localStorage.setItem('cahlang', l); } catch (e) { } applyLang(true); render(); }
-        const LOGO = '<svg viewBox="0 0 12.7 12.3"><path fill="currentColor" stroke="currentColor" stroke-width=".12" d="M0.65 2.87C0.65 2.87 0.12 3.06 0.31 3.59L3.27 11.71C3.27 11.71 3.46 12.24 3.99 12.04L9.45 10.06C9.45 10.06 9.98 9.86 9.79 9.33L6.84 1.21C6.84 1.21 6.64 0.68 6.11 0.88L0.65 2.87Z"/><path style="fill:var(--cbg)" stroke="currentColor" stroke-width=".3" d="M6.22 0.29C6.22 0.29 5.66 0.22 5.59 0.78L4.54 9.35C4.54 9.35 4.47 9.91 5.03 9.98L10.8 10.69C10.8 10.69 11.37 10.76 11.43 10.2L12.49 1.62C12.49 1.62 12.56 1.06 11.99 0.99L6.22 0.29Z"/></svg>';
+        const LOGO = '<svg viewBox="0 0 12.7 12.3"><path style="fill:var(--lbf);stroke:var(--lbr)" stroke-width=".3" d="M0.65 2.87C0.65 2.87 0.12 3.06 0.31 3.59L3.27 11.71C3.27 11.71 3.46 12.24 3.99 12.04L9.45 10.06C9.45 10.06 9.98 9.86 9.79 9.33L6.84 1.21C6.84 1.21 6.64 0.68 6.11 0.88L0.65 2.87Z"/><path style="fill:var(--lff);stroke:var(--lfr)" stroke-width=".3" d="M6.22 0.29C6.22 0.29 5.66 0.22 5.59 0.78L4.54 9.35C4.54 9.35 4.47 9.91 5.03 9.98L10.8 10.69C10.8 10.69 11.37 10.76 11.43 10.2L12.49 1.62C12.49 1.62 12.56 1.06 11.99 0.99L6.22 0.29Z"/></svg>';
         function badge(t) { const W = Math.max(11.6, t.length * 3.3 + 5.2); return '<svg class="bsv" viewBox="0 0 ' + W + ' 11.6" style="height:4.1mm;width:' + (W / 11.6 * 4.1) + 'mm"><rect width="' + W + '" height="11.6" rx="5.8"/><text x="' + W / 2 + '" y="7.77" text-anchor="middle" font-size="5.5" font-weight="700">' + esc(t) + '</text></svg>'; }
-        let logoURL = null;
+        let logoURL = null, logoURLB = null, logoURLBI = null;
         const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
         function parseCSV(t) {
@@ -605,7 +629,7 @@
         }
 
         function textHTML(text) {
-            text = text.replace(/\\n/g, '\n');
+            text = text.replace(/[\u3164\u2800\u200B\uFEFF]/g, '').replace(/\\n/g, '\n');
             const nl = s => esc(s).replace(/\n/g, '<br>');
             const segs = text.split(/_{3,}/);
             let h = nl(segs[0]);
@@ -613,18 +637,19 @@
                 const s = segs[i], p = s.match(/^[.,!?:;…“”„"')\]]*/)[0]; let rest = s.slice(p.length), tail = '';
                 const m = rest.match(/^[ \t]*(\S{1,4})[ \t]*(?=\n|$)/);
                 if (m) { tail = m[1]; rest = rest.slice(m[0].length); }
-                h += '<span class="bw"><span class="blank"></span><span class="pu">' + esc(p) + '</span>' + (tail ? '<span class="tl"> ' + esc(tail) + '</span>' : '') + '</span>';
+                h += '<span class="bw">&#8203;<span class="blank"></span><span class="pu">' + esc(p) + '</span>' + (tail ? '<span class="tl"> ' + esc(tail) + '</span>' : '') + '</span>';
                 if (rest.trim()) h += (/^\s*\n/.test(rest) ? '' : '<br>') + nl(rest.replace(/^[ \t]+/, ''));
-                else if (/^\s*\n/.test(rest)) h += '<br>';
+                else if (/^\s*\n/.test(rest)) h += '<br>'.repeat((rest.match(/\n/g) || []).length);
             }
             return h;
         }
 
         function cardHTML(c, i) {
             const n = (c.text.match(/_{3,}/g) || []).length;
-            const logo = logoURL ? '<img class="' + ($('inv').checked ? 'inv' : '') + '" src="' + logoURL + '" alt="">' : LOGO;
+            const iv = $('inv').checked, lu = (c.b && logoURLB) ? ((iv && logoURLBI) || logoURLB) : logoURL;
+            const logo = lu ? '<img class="' + (iv && !(c.b && logoURLB) ? 'inv' : '') + '" src="' + lu + '" alt="">' : LOGO;
             const pick = (c.b && n >= 2) ? '<div class="pick">PICK <svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/><text x="5" y="8" text-anchor="middle" font-size="8.4" font-weight="700">' + n + '</text></svg></div>' : '';
-            return '<div class="card ' + (c.b ? 'b' : 'w') + '"><div class="txt">' + textHTML(c.text) + '</div><div class="foot"><span class="lg">' + logo + '</span><span>' + esc($('lname').value) + '</span>' + pick + '</div></div>';
+            return '<div class="card ' + (c.b ? 'b' : 'w') + (c.b && $('inv').checked ? ' invl' : '') + '"><div class="txt">' + textHTML(c.text) + '</div><div class="foot"><span class="lg">' + logo + '</span><span>' + esc($('lname').value) + '</span>' + pick + '</div></div>';
         }
 
         function fit(card) {
@@ -676,27 +701,115 @@
         }
 
         function save() {
-            try { localStorage.setItem('cahgen', JSON.stringify({ csv: $('csv').value, set: $('set').value, lname: $('lname').value, inv: $('inv').checked, cut: $('cut').checked, fill: $('fill').checked, paper: $('paper').value, logo: logoURL })); } catch (e) { }
+            try { localStorage.setItem('cahgen', JSON.stringify({ csv: $('csv').value, set: $('set').value, lname: $('lname').value, inv2: $('inv').checked, cut: $('cut').checked, fill: $('fill').checked, paper: $('paper').value, logo: logoURL, logoB: logoURLB, logoBI: logoURLBI })); } catch (e) { }
         }
         function load() {
             let s = null; try { s = JSON.parse(localStorage.getItem('cahgen') || 'null'); } catch (e) { }
             $('csv').value = (s && s.csv) || EXS[L];
-            if (s) { $('set').value = s.set || 'Set 1'; $('lname').value = s.lname || ''; $('inv').checked = s.inv !== false; $('cut').checked = s.cut !== false; $('fill').checked = s.fill !== false; $('paper').value = s.paper || 'A4'; logoURL = s.logo || null; }
+            if (s) { $('set').value = s.set || 'Set 1'; $('lname').value = s.lname || 'Cards Against Humanity'; $('inv').checked = s.inv2 === true; $('cut').checked = s.cut !== false; $('fill').checked = s.fill !== false; $('paper').value = s.paper || 'A4'; logoURL = s.logo || null; logoURLB = s.logoB || null; logoURLBI = s.logoBI || null; }
         }
 
         let tm; const later = () => { clearTimeout(tm); tm = setTimeout(render, 200); };
         ['csv', 'set', 'lname'].forEach(i => $(i).addEventListener('input', later));
         ['inv', 'cut', 'fill', 'paper'].forEach(i => $(i).addEventListener('change', render));
         $('csvfile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { $('csv').value = t; render(); }); });
-        $('logo').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { logoURL = r.result; render(); }; r.readAsDataURL(f); });
-        $('rlogo').addEventListener('click', () => { logoURL = null; $('logo').value = ''; render(); });
+        $('logo').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { logoURL = r.result; logoURLB = logoURLBI = null; render(); }; r.readAsDataURL(f); });
+        $('rlogo').addEventListener('click', () => { logoURL = logoURLB = logoURLBI = null; $('logo').value = ''; render(); });
         $('ex').addEventListener('click', () => { $('csv').value = EXS[L]; render(); });
+        let oldTitle = null;
+        addEventListener('beforeprint', () => {
+            oldTitle = document.title;
+            const n = (($('set').value || '').trim() + '_' + ($('lname').value || '').trim()).replace(/[\\/:*?"<>|]+/g, '').replace(/^_+|_+$/g, '');
+            if (n) document.title = n;
+        });
+        addEventListener('afterprint', () => { if (oldTitle !== null) document.title = oldTitle; });
         $('print').addEventListener('click', () => window.print());
+        $('exp').addEventListener('click', () => {
+            const b = new Blob(['\uFEFF' + $('csv').value], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = (($('set').value || 'cards').trim().replace(/[^\w\-]+/g, '_') || 'cards') + '.csv';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        });
         function rescale() {
             const sh = $('sheets'), pg = sh.querySelectorAll('.page'); if (!pg.length) return;
             const cs = getComputedStyle(sh), s = Math.min(1, (sh.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) / pg[0].offsetWidth);
             sh.querySelectorAll('.pgw').forEach(w => { const p = w.firstChild; w.style.width = p.offsetWidth * s + 'px'; w.style.height = p.offsetHeight * s + 'px'; p.style.setProperty('--s', s); });
         }
+
+        /* ---- Logo-Editor ---- */
+        const ED = { img: null, src: null, x: 0, y: 0, s: 1, r: 0 }, EDW = 480, EDH = 465;
+        const EDP = [...LOGO.matchAll(/ d="([^"]+)"/g)].map(m => new Path2D(m[1]));
+        const edMode = () => document.querySelector('input[name=edm]:checked').value;
+        function edSrc() {
+            if (!ED.img) return;
+            if (!$('edbw').checked) { ED.src = ED.img; return; }
+            const m = Math.min(1, 900 / Math.max(ED.img.width, ED.img.height)), w = Math.round(ED.img.width * m), h = Math.round(ED.img.height * m);
+            const o = document.createElement('canvas'); o.width = w; o.height = h;
+            const c = o.getContext('2d'); c.drawImage(ED.img, 0, 0, w, h);
+            const d = c.getImageData(0, 0, w, h), t = +$('edt').value;
+            for (let i = 0; i < d.data.length; i += 4) { const dk = (.3 * d.data[i] + .59 * d.data[i + 1] + .11 * d.data[i + 2]) < t; d.data[i] = dk ? 35 : 255; d.data[i + 1] = dk ? 31 : 255; d.data[i + 2] = dk ? 32 : 255; }
+            c.putImageData(d, 0, 0); ED.src = o;
+        }
+        let edInvC = null, edInvFor = null;
+        function edInv() {
+            if (edInvFor === ED.src) return edInvC;
+            const w0 = ED.src.naturalWidth || ED.src.width, h0 = ED.src.naturalHeight || ED.src.height, m = Math.min(1, 900 / Math.max(w0, h0));
+            const o = document.createElement('canvas'); o.width = Math.round(w0 * m); o.height = Math.round(h0 * m);
+            const c = o.getContext('2d'); c.drawImage(ED.src, 0, 0, o.width, o.height);
+            const d = c.getImageData(0, 0, o.width, o.height);
+            for (let i = 0; i < d.data.length; i += 4) { if ($('edbw').checked) { const dk = d.data[i] < 128; d.data[i] = dk ? 255 : 35; d.data[i + 1] = dk ? 255 : 31; d.data[i + 2] = dk ? 255 : 32; } else { d.data[i] = 255 - d.data[i]; d.data[i + 1] = 255 - d.data[i + 1]; d.data[i + 2] = 255 - d.data[i + 2]; } }
+            c.putImageData(d, 0, 0); edInvFor = ED.src; edInvC = o; return o;
+        }
+        function edDraw(c, v) {
+            c.clearRect(0, 0, EDW, EDH);
+            const front = edMode() === 'front', k = EDW / 12.7;
+            const place = () => {
+                if (!ED.src) return;
+                const src = v === 'bi' ? edInv() : ED.src;
+                const iw = src.naturalWidth || src.width, ih = src.naturalHeight || src.height;
+                const cx = front ? 8.6 * k : EDW / 2, cy = front ? 5.5 * k : EDH / 2, bw = front ? 6.6 * k : EDW, bh = front ? 10 * k : EDH;
+                const sc = ED.s * Math.max(bw / iw, bh / ih);
+                c.save(); c.translate(cx + ED.x, cy + ED.y); c.rotate(ED.r * Math.PI / 180); c.scale(sc, sc); c.drawImage(src, -iw / 2, -ih / 2); c.restore();
+            };
+            if (!front) { place(); return; }
+            const col = v === 'bi' ? ['#fff', '#fff', '#231f20', '#fff'] : v === 'b' ? ['#231f20', '#fff', '#fff', '#231f20'] : ['#000', '#000', '#fff', '#000'];
+            c.save(); c.scale(k, k); c.lineWidth = .3; c.lineJoin = 'round';
+            c.fillStyle = col[0]; c.strokeStyle = col[1]; c.fill(EDP[0]); c.stroke(EDP[0]);
+            c.fillStyle = col[2]; c.fill(EDP[1]);
+            c.save(); c.clip(EDP[1]); c.setTransform(1, 0, 0, 1, 0, 0); place(); c.restore();
+            c.strokeStyle = col[3]; c.stroke(EDP[1]); c.restore();
+        }
+        const edPaint = () => edDraw($('edc').getContext('2d'), 'w');
+        const edSync = () => { $('edz').value = ED.s; $('edr').value = ED.r; };
+        const edReset = () => { ED.x = ED.y = ED.r = 0; ED.s = 1; edSync(); edPaint(); };
+        $('edopen').addEventListener('click', () => { $('ed').showModal(); edPaint(); });
+        $('edcancel').addEventListener('click', () => $('ed').close());
+        $('edreset').addEventListener('click', edReset);
+        $('edfile').addEventListener('change', e => {
+            const f = e.target.files[0]; if (!f) return;
+            const im = new Image();
+            im.onload = () => { ED.img = im; edSrc(); edReset(); };
+            im.src = URL.createObjectURL(f);
+        });
+        $('edz').addEventListener('input', () => { ED.s = +$('edz').value; edPaint(); });
+        $('edr').addEventListener('input', () => { ED.r = +$('edr').value; edPaint(); });
+        ['edbw', 'edt'].forEach(i => $(i).addEventListener('input', () => { edSrc(); edPaint(); }));
+        document.querySelectorAll('input[name=edm]').forEach(i => i.addEventListener('change', edPaint));
+        let drag = null; const cv = $('edc');
+        cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, ox: ED.x, oy: ED.y }; cv.setPointerCapture(e.pointerId); });
+        cv.addEventListener('pointermove', e => { if (!drag) return; const k = EDW / cv.getBoundingClientRect().width; ED.x = drag.ox + (e.clientX - drag.x) * k; ED.y = drag.oy + (e.clientY - drag.y) * k; edPaint(); });
+        cv.addEventListener('pointerup', () => { drag = null; });
+        cv.addEventListener('wheel', e => { e.preventDefault(); ED.s = Math.min(4, Math.max(.1, ED.s * (e.deltaY < 0 ? 1.05 : .95))); edSync(); edPaint(); }, { passive: false });
+        $('edok').addEventListener('click', () => {
+            if (ED.img) {
+                const mk = v => { const o = document.createElement('canvas'); o.width = EDW; o.height = EDH; edDraw(o.getContext('2d'), v); return o.toDataURL('image/png'); };
+                if (edMode() === 'front') { logoURL = mk('w'); logoURLB = mk('b'); logoURLBI = mk('bi'); } else { logoURL = mk(); logoURLB = logoURLBI = null; }
+                render();
+            }
+            $('ed').close();
+        });
         addEventListener('resize', rescale);
         $('lde').addEventListener('click', () => setLang('de')); $('len').addEventListener('click', () => setLang('en'));
         load(); applyLang(false); render();
